@@ -10,13 +10,14 @@ import {
   useMatches,
 } from '@remix-run/react';
 import {ShopifySalesChannel, Seo} from '@shopify/hydrogen';
+import cookie from 'cookie';
 import {Layout} from '~/components';
 import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
 import styles from './styles/app.css';
 import favicon from '../public/favicon.svg';
 import {seoPayload} from '~/lib/seo.server';
-import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
+import {DEFAULT_LOCALE, parseMenu, getCartId} from './lib/utils';
 import invariant from 'tiny-invariant';
 import {useAnalytics} from './hooks/useAnalytics';
 
@@ -41,9 +42,9 @@ export const meta = () => ({
 });
 
 export async function loader({request, context}) {
-  const [customerAccessToken, cartId, layout] = await Promise.all([
+  const cartId = getCartId(request);
+  const [customerAccessToken, layout] = await Promise.all([
     context.session.get('customerAccessToken'),
-    context.session.get('cartId'),
     getLayoutData(context),
   ]);
 

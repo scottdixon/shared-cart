@@ -3,20 +3,18 @@ import {Await, useMatches} from '@remix-run/react';
 import {Suspense} from 'react';
 import invariant from 'tiny-invariant';
 import {json} from '@shopify/remix-oxygen';
-import {isLocalPath} from '~/lib/utils';
+import {getCartId, isLocalPath} from '~/lib/utils';
 import {CartAction} from '~/lib/type';
 
 export async function action({request, context}) {
   const {session, storefront} = context;
   const headers = new Headers();
 
-  const [formData, storedCartId, customerAccessToken] = await Promise.all([
+  let cartId = getCartId(request);
+  const [formData, customerAccessToken] = await Promise.all([
     request.formData(),
-    session.get('cartId'),
     session.get('customerAccessToken'),
   ]);
-
-  let cartId = storedCartId;
 
   const cartAction = formData.get('cartAction');
   invariant(cartAction, 'No cartAction defined');
@@ -131,10 +129,9 @@ export async function action({request, context}) {
   }
 
   /**
-   * The Cart ID may change after each mutation. We need to update it each time in the session.
+   * The Cart ID may change after each mutation. We need to update it each time in the cookie.
    */
-  session.set('cartId', cartId);
-  headers.set('Set-Cookie', await session.commit());
+  headers.set('Set-Cookie', `cart=${cartId.split('/').pop()}`);
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string' && isLocalPath(redirectTo)) {

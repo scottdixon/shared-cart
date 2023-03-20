@@ -1,4 +1,5 @@
 import {useLocation, useMatches} from '@remix-run/react';
+import cookie from 'cookie';
 
 // @ts-expect-error types not available
 import typographicBase from 'typographic-base';
@@ -280,4 +281,17 @@ export function isLocalPath(url) {
   }
 
   return false;
+}
+
+/**
+ * Shopify liquid storefronts store cart IDs in a 'cart' cookie.
+ * By doing the same, merchants can switch from liquid to Hydrogen
+ * without customers losing carts.
+ */
+export function getCartId(request) {
+  let {cart} = cookie.parse(request.headers.get('Cookie'));
+  if (cart) {
+    cart = `gid://shopify/Cart/${cart}`;
+  }
+  return cart;
 }
