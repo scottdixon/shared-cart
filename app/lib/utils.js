@@ -1,5 +1,4 @@
 import {useLocation, useMatches} from '@remix-run/react';
-import cookie from 'cookie';
 
 // @ts-expect-error types not available
 import typographicBase from 'typographic-base';
@@ -289,7 +288,12 @@ export function isLocalPath(url) {
  * without customers losing carts.
  */
 export function getCartId(request) {
-  let {cart} = cookie.parse(request.headers.get('Cookie'));
+  let cart = request.headers
+    .get('Cookie')
+    .split(';')
+    .find((cookie) => cookie.trim().startsWith('cart='))
+    .substring(6);
+
   if (cart) {
     cart = `gid://shopify/Cart/${cart}`;
   }

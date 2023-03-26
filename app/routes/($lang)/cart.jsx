@@ -131,7 +131,7 @@ export async function action({request, context}) {
   /**
    * The Cart ID may change after each mutation. We need to update it each time in the cookie.
    */
-  headers.set('Set-Cookie', `cart=${cartId.split('/').pop()}`);
+  headers.append('Set-Cookie', `cart=${cartId.split('/').pop()}`);
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string' && isLocalPath(redirectTo)) {

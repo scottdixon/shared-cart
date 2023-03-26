@@ -17,7 +17,6 @@ import {cartCreate, cartDiscountCodesUpdate} from './cart';
 export async function loader({request, context, params}) {
   const {storefront} = context;
   // N.B. This route will probably be removed in the future.
-  const session = context.session;
   const {code} = params;
 
   const url = new URL(request.url);
@@ -46,7 +45,7 @@ export async function loader({request, context, params}) {
 
     //! cart created - we only need a Set-Cookie header if we're creating
     cartId = cart.id;
-    headers.set('Set-Cookie', `cart=${cartId.split('/').pop()}`);
+    headers.append('Set-Cookie', `cart=${cartId.split('/').pop()}`);
   }
 
   //! apply discount to the cart
